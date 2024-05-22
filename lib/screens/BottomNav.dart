@@ -5,6 +5,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../constants/global_constants.dart';
 import '../widgets/DrawerClass.dart';
+import 'AllProperties.dart';
 import 'Settings.dart';
 import 'dashboard/Dashboard.dart';
 
@@ -24,7 +25,7 @@ class _BottomNavigationExampleState extends State {
 
   List _pages = [
     Dashboard(),
-    Dashboard(),
+    AllProperties(),
     Dashboard(),
     Settings(),
 

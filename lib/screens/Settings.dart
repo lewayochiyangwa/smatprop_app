@@ -1,9 +1,15 @@
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:smatprop/constants/global_constants.dart';
 import 'package:smatprop/screens/pricing.dart';
 import 'dart:io';
+import 'package:http/http.dart' as http;
+import 'package:path/path.dart' as path;
+
+import 'fileupload_dialog.dart';
+import 'fileupload_dialog_nonparam.dart';
 
 class Settings extends StatefulWidget {
   @override
@@ -14,46 +20,71 @@ class _SettingsState extends State<Settings> {
 
 
 //===========================================
-  //List<CameraDescription>? cameras; //list out the camera available
-  //CameraController? controller; //controller for camera
-  XFile? image2; //for captured image
-  bool photo = false;
-  bool upload = false;
 
-  bool callback = false;
-bool _imageSelected = false;
+  File? _selectedFile;
+  bool _uploading = false;
 
-  String? _base64Image;
 
-  File ? _selectedImage;
-  /*Future _pickImageFromGallery() async {
-    final pickedImage = await ImagePicker().pickImage(source: ImageSource.gallery);
-    if (pickedImage != null) {
-      setState(()  {
-        _selectedImage = File(pickedImage!.path);
-        upload = true;
-      });
-    }
-  }*/
-  File? image;
-  Future<void> _pickImageFromGallery() async {
-    final pickedImage = await ImagePicker().pickImage(source: ImageSource.gallery);
-    if (pickedImage != null) {
+
+  void _showFilePicker() async {
+    FilePickerResult? result = await FilePicker.platform.pickFiles();
+
+    if (result != null) {
       setState(() {
-        _selectedImage = File(pickedImage.path);
-        _imageSelected = true;
+        _selectedFile = File(result.files.single.path!);
       });
     }
   }
 
-  Future pickImage() async {
+  void _uploadFile() async {
+    if (_selectedFile == null) {
+      return;
+    }
+
+    setState(() {
+      _uploading = true;
+    });
+
     try {
-      final image = await ImagePicker().pickImage(source: ImageSource.gallery);if(image == null) return;final imageTemp = File(image.path);setState(() => this.image = imageTemp);
-    } on PlatformException catch(e) {
-      print('Failed to pick image: $e');
+      var request = http.MultipartRequest(
+        'POST',
+        Uri.parse('http://192.168.100.27:8091/server/uploadflutter'),
+      );
+
+      request.files.add(await http.MultipartFile.fromPath(
+        'file',
+        _selectedFile!.path,
+      ));
+
+      // request.fields['id'] = '13.567';
+      // request.fields['filename'] = '873';
+      String? filePath = _selectedFile?.absolute.toString();
+      String fileName = path.basename(filePath!);
+
+
+      fileName = fileName.substring(0, fileName.length - 1);
+
+    //  request.fields['ID'] = widget.id;
+      request.fields['ID'] = '2';
+      request.fields['FileName'] = fileName;
+
+      var response = await request.send();
+
+      if (response.statusCode == 200) {
+
+        print('File uploaded successfully');
+        Navigator.of(context).pop();
+      } else {
+        print('File upload failed with status: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('Error uploading file: $e');
+    } finally {
+      setState(() {
+        _uploading = false;
+      });
     }
   }
-
 
 //==============================
   @override
@@ -218,8 +249,13 @@ bool _imageSelected = false;
           child: InkWell(
             onTap: () async{
               print("lets upload");
-             //  _pickImageFromGallery;();
-              pickImage();
+
+              showDialog(
+                context: context,
+                builder: (BuildContext context) {
+                  return FileUploadNonParamDialog();
+                },
+              );
             },
             child: Icon(
               Icons.camera_alt,

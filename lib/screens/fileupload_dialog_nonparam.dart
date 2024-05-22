@@ -7,17 +7,16 @@ import 'package:path/path.dart' as path;
 
 import '../constants/global_constants.dart';
 
-class FileUploadDialog extends StatefulWidget {
-  final String id;
+class FileUploadNonParamDialog extends StatefulWidget {
 
-  FileUploadDialog({required this.id});
-
+ // const FileUploadNonParamDialog({Key? key}) : super(key: key);
+  const FileUploadNonParamDialog();
 
   @override
-  _FileUploadDialogState createState() => _FileUploadDialogState();
+  _FileUploadNonParamDialogState createState() => _FileUploadNonParamDialogState();
 }
 
-class _FileUploadDialogState extends State<FileUploadDialog> {
+class _FileUploadNonParamDialogState extends State<FileUploadNonParamDialog> {
   File? _selectedFile;
   bool _uploading = false;
 
@@ -57,11 +56,10 @@ class _FileUploadDialogState extends State<FileUploadDialog> {
      // request.fields['filename'] = '873';
       String? filePath = _selectedFile?.absolute.toString();
       String fileName = path.basename(filePath!);
+      fileName = fileName.substring(0, fileName.length - 1);
 
-
-       fileName = fileName.substring(0, fileName.length - 1);
-
-      request.fields['ID'] = widget.id;
+     // request.fields['ID'] = widget.id;
+      request.fields['ID'] = '55';
       request.fields['FileName'] = fileName;
 
       var response = await request.send();

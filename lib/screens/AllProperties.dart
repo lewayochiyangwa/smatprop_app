@@ -6,6 +6,7 @@ import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
 import 'package:paynow/paynow.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:smatprop/widgets/CustomButtton.dart';
 
 import '../constants/global_constants.dart';
 import '../widgets/DrawerClass.dart';
@@ -52,77 +53,57 @@ class _AllPropertiesState extends State<AllProperties> {
     _getData();
   }
 
+  Future<void> _getData() async {
 
+    logindata = await SharedPreferences.getInstance();
+   // clientID=logindata.getString('clientID')!;
 
-  void _showDepositDialog(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) => AlertDialog(
-        title: Text('Deposit'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            TextField(
-              controller: _amountController,
-              keyboardType: TextInputType.number,
-              decoration: InputDecoration(
-                labelText: 'Amount',
-              ),
-            ),
-            TextField(
-              controller: _phoneNumberController,
-              keyboardType: TextInputType.phone,
-              decoration: InputDecoration(
-                labelText: 'Phone Number',
-              ),
-            ),
-          ],
-        ),
-        actions: [
-          ElevatedButton(
-            child: Text('Cancel'),
-            style: ElevatedButton.styleFrom(
-              elevation: 8,
-              backgroundColor: Colors.blue,
-              textStyle: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 10,
-                  fontStyle: FontStyle.normal),
-            ),
-            onPressed: () {
-              Navigator.of(context).pop();
-            },
-          ),
-          ElevatedButton(
-            child: Text('Deposit'),
-            style: ElevatedButton.styleFrom(
-              elevation: 8,
-              backgroundColor: Colors.blue,
-              textStyle: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 10,
-                  fontStyle: FontStyle.normal),
-            ),
-            onPressed: () {
-              double amount = double.tryParse(_amountController.text) ?? 0.0;
-              String phoneNumber = _phoneNumberController.text;
-              _postDeposit(amount, phoneNumber);
-              Navigator.of(context).pop();
-            },
-          ),
-        ],
-      ),
-    );
+    var url = Uri.parse('http://'+ip_address2+':93/gsam_clienttaku/api/report/trxn_requests');
+    var headers = {'Content-Type': 'application/json'};
+    var body = json.encode({'ClientID': 873});
+
+    var response = await http.post(url, headers: headers, body: body);
+    if (response.statusCode == 200) {
+      var jsonData = json.decode(response.body);
+      print("takupinda mu table viewing===AllProperties.dart");
+      print(jsonData['Data']);
+      setState(() {
+        print("tipei status yacho tione for empt trx");
+        print("iyo kk :: "+jsonData['Status']);
+        print("check condition");
+        print(jsonData['Status']=="Error");
+
+        trx_empty= jsonData['Status'];
+        if(jsonData['Status']=="Error"){
+
+        }else{
+          _dataList = jsonData['Data'];
+          _filteredDataList = List.from(_dataList);
+        }
+
+      });
+    } else {
+      print('Request failed with status: ${response.statusCode}.');
+    }
   }
+
+  void _filterDataList(String searchQuery) {
+    setState(() {
+      _filteredDataList = _dataList.where((data) {
+        return data[2].toLowerCase().contains(searchQuery.toLowerCase()) || data[4].toLowerCase().contains(searchQuery.toLowerCase());
+      }).toList();
+    });
+  }
+
+
+
+
+
+
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar:AppBar(
-        centerTitle: true,
-        backgroundColor: Colors.blue,
-      ),
-      drawer: DrawerClass(),
       body: Column(
         children: [
           SizedBox(height: 15,),
@@ -148,7 +129,7 @@ class _AllPropertiesState extends State<AllProperties> {
                       //color: Colors.black,
                       height: 20,
                       width: 200,
-                      child: Text("There are no Transactions",
+                      child: Text("There are no Properties to display",
                         style: TextStyle(fontSize: 14,fontWeight: FontWeight.bold),)
                      )
                     :
@@ -181,24 +162,46 @@ class _AllPropertiesState extends State<AllProperties> {
                     itemBuilder: (context, index) {
                       final data = _filteredDataList[index];
                       return Container(
-                        decoration: BoxDecoration(
+                     /*   decoration: BoxDecoration(
                           border: Border.all(
                               color: Colors.blue.shade100,
                             width: 2
                           ),
                           borderRadius: BorderRadius.circular(10),
+                        ),*/
+                        decoration: BoxDecoration(
+                          border: Border.all(
+                            color: Colors.blue.shade100,
+                            width: 2,
+                          ),
+                          borderRadius: BorderRadius.circular(10),
+                          color: Colors.white,
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.grey.withOpacity(0.5),
+                              spreadRadius: 2,
+                              blurRadius: 5,
+                              offset: Offset(0, 3), // changes position of shadow
+                            ),
+                          ],
                         ),
                         margin: EdgeInsets.all(10),
                         child: ListTile(
-                          leading:  data[3]=="Deposit"?Icon(Icons.add_circle_sharp,color: Colors.green):Icon(Icons.remove_circle_sharp,color: Colors.red ),
+                          leading:/*NetworkImage(data[1])!=null? CircleAvatar(
+                            backgroundImage: NetworkImage(data[1]),
+                          ):*/ClipRRect(
+                            borderRadius: BorderRadius.circular(10.0),
+                            child: Image.asset(
+                              'assets/images/1.png',
+                              width: 80,
+                              height: 220,
+                            ),
+                          ),
                           trailing: Row(
                             mainAxisSize: MainAxisSize.min,
+
                          children: [
-                           Text("Pending",),
-                         Column(children: [
-                           Text(convertDateTimeDisplay(data[2])),
-                           SizedBox(height: 5,),
-                          // Text("PendingC2"),
+
                            InkWell(
                              child: Icon(Icons.upload_file,color: Colors.blue,),
                              onTap: () {
@@ -210,8 +213,17 @@ class _AllPropertiesState extends State<AllProperties> {
                                );
                              },
                            ),
-                         ],),
-
+                           SizedBox(width: 10,),
+                           ElevatedButton(
+                               style: ElevatedButton.styleFrom(
+                                   backgroundColor:ThemeColor,
+                                   fixedSize: Size( MediaQuery.of(context).size.width * 0.20,MediaQuery.of(context).size.height / 120)// * 0.005 Set the button color here width, height
+                               ),
+                               onPressed:(){},
+                               child: Text("Apply",
+                                   style: TextStyle(fontSize:10,fontWeight: FontWeight.bold,color:Colors.black)
+                               )
+                           ),
                          ],
                           ),
                           title: Text(data[3],  style: TextStyle(
@@ -234,42 +246,7 @@ class _AllPropertiesState extends State<AllProperties> {
               ],
             ),
           ),
-          Padding(
-            padding: const EdgeInsets.only(left: 50,bottom: 10,right: 50),
-            child: Row(
-              children: [
-                ElevatedButton(
-                  child: Text('Withdraw'),
-                  style: ElevatedButton.styleFrom(
-                    fixedSize: const Size(100,10),
-                    elevation: 10,
-                    backgroundColor: Colors.blue,
-                    textStyle: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 10,
-                        fontStyle: FontStyle.normal),
-                  ),
-                  onPressed: () {},
-                ),
-               Container(width: 60,),
-                ElevatedButton(
-                  child: Text('Deposit'),
-                  style: ElevatedButton.styleFrom(
-                    fixedSize: const Size(100,10),
-                    elevation: 10,
-                    backgroundColor: Colors.blue,
-                    textStyle: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 10,
-                        fontStyle: FontStyle.normal),
-                  ),
-                  onPressed: () {
-                    _showDepositDialog(context);
-                  },
-                ),
-              ],
-            ),
-          )
+
         ],
 
       ),
