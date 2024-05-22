@@ -1,4 +1,4 @@
-/**import 'package:avatar_glow/avatar_glow.dart';
+import 'package:avatar_glow/avatar_glow.dart';
 import 'package:flutter/material.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
@@ -17,14 +17,14 @@ import 'dart:io';
 
 
 
-class MyListView extends StatefulWidget {
+class AllProperties extends StatefulWidget {
   @override
-   _MyListViewState createState() => _MyListViewState();
+   _AllPropertiesState createState() => _AllPropertiesState();
 
 
 }
 
-class _MyListViewState extends State<MyListView> {
+class _AllPropertiesState extends State<AllProperties> {
   String convertDateTimeDisplay(String date) {
     final DateFormat displayFormater = DateFormat('yyyy-MM-dd HH:mm:ss');
     final DateFormat serverFormater = DateFormat('dd-MM-yyyy');
@@ -52,119 +52,7 @@ class _MyListViewState extends State<MyListView> {
     _getData();
   }
 
-  Future<void> _getData() async {
 
-    logindata = await SharedPreferences.getInstance();
-    clientID=logindata.getString('clientID')!;
-
-    var url = Uri.parse('http://'+ip_address+':93/gsam_clienttaku/api/report/trxn_requests');
-    var headers = {'Content-Type': 'application/json'};
-    var body = json.encode({'ClientID': clientID});
-
-    var response = await http.post(url, headers: headers, body: body);
-    if (response.statusCode == 200) {
-      var jsonData = json.decode(response.body);
-      print("takupinda mu table viewing===tutor_table.dart");
-      print(jsonData['Data']);
-      setState(() {
-        print("tipei status yacho tione for empt trx");
-        print("iyo kk :: "+jsonData['Status']);
-        print("check condition");
-        print(jsonData['Status']=="Error");
-
-        trx_empty= jsonData['Status'];
-        if(jsonData['Status']=="Error"){
-
-        }else{
-          _dataList = jsonData['Data'];
-          _filteredDataList = List.from(_dataList);
-        }
-
-      });
-    } else {
-      print('Request failed with status: ${response.statusCode}.');
-    }
-  }
-
-  void _filterDataList(String searchQuery) {
-    setState(() {
-      _filteredDataList = _dataList.where((data) {
-        return data[2].toLowerCase().contains(searchQuery.toLowerCase()) || data[4].toLowerCase().contains(searchQuery.toLowerCase());
-      }).toList();
-    });
-  }
-
-  Future<void> _postDeposit(double amount, String phoneNumber) async {
-    pay("Deposit",amount.toString(),phoneNumber);
-    var url = Uri.parse('http://'+ip_address+':93/gsam_clienttaku/api/deposit');
-    var headers = {'Content-Type': 'application/json'};
-    var body = json.encode({
-      'Amount': amount,
-      'Phonenumber': phoneNumber,
-    });
-
-    var response = await http.post(url, headers: headers, body: body);
-    if (response.statusCode == 200) {
-   //   print('Deposit successful.');
-    } else {
-      //print('Deposit failed with status: ${response.statusCode}.');
-    }
-  }
-
-  void pay(String trxnType,String amount,String phone)async{
-    print("tapinda mu payment");
-    //print(trxnType.toString());
-    String  _phoneController = phone;
-    Paynow paynow = Paynow(integrationKey: "960ad10a-fc0c-403b-af14-e9520a50fbf4", integrationId: "6054", returnUrl: "http://google.com", resultUrl: "http://google.co");
-    Payment payment = paynow.createPayment("user", "leroy.chiyangwa1994@gmail.com");
-
-    payment.add(trxnType,double.parse(amount));
-
-
-    // Initiate Mobile Payment
-    //paynow.sendMobile(payment, _phoneController ?? "0784442662",)
-    paynow.sendMobile(payment, _phoneController ?? "0783065525",)
-        .then((InitResponse response)async{
-      // display results
-      print(response());
-      print("ndaakuda");
-      print('------------------');
-      print(response.pollUrl);
-      getPollUrl = response.pollUrl;
-      print('------------------');
-      await Future.delayed(Duration(seconds: 20~/2));
-      // Check Transaction status from pollUrl
-      paynow.checkTransactionStatus(response.pollUrl)
-          .then((StatusResponse status) async {
-        print("Before status paid");
-        print("hatsvike");
-        /**  var url = Uri.parse('http://192.168.100.32:8090/server/paynowMobile');
-            //  final Uri = 'https://na57.salesforce.com/services/oauth2/token';
-            var map = new Map<String, dynamic>();
-            map['type'] = _textFieldController.text;
-            map['amount'] = _trxnTypeController.text;
-            map['clientID'] = '873';
-            map['valueDate'] = 'example@mail.com.us';
-            map['device'] = 'mobile';
-
-            print("tomboona the json body request");
-            print(map);
-
-            http.Response postResponse = await http.post(
-            url,
-            headers: {"Content-Type": "application/json"},
-            body: map,
-            );*/
-
-
-
-        print("before Uri");
-        //  print(postResponse.body);
-        print(status.paid);
-      });
-    });
-
-  }
 
   void _showDepositDialog(BuildContext context) {
     showDialog(
@@ -389,4 +277,4 @@ class _MyListViewState extends State<MyListView> {
   }
 
 
-}*/
+}

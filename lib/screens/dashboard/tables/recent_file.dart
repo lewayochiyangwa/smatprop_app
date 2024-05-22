@@ -46,7 +46,7 @@ class RecentFiles extends StatelessWidget {
 
 
   final dashcard_controller =  Get.put<TopPricesController>(TopPricesController());
-    return Obx(() => dashcard_controller.top_prices_isLoading.value
+    return  Obx(() => dashcard_controller.top_prices_isLoading.value
 
         ?  Center(child:AvatarGlow(
       glowColor: Colors.blue,

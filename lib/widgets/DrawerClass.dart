@@ -3,6 +3,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import '../constants/global_constants.dart';
 
+import '../screens/AllProperties.dart';
 import 'CustomDevider.dart';
 
 
@@ -92,12 +93,12 @@ class _DrawerClassState extends State<DrawerClass> {
             ),
             ListTile(
               leading: Icon(Icons.contact_mail),
-              title: Text("test 3",style: TextStyle(color: ThemeColor2)),
+              title: Text("AllProperties",style: TextStyle(color: ThemeColor2)),
               onTap: () {
-                /* Navigator.push(
+                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => HymnHomePage()),// Settings()),
-                );*/
+                  MaterialPageRoute(builder: (context) => AllProperties()),// Settings()),
+                );
 
               },
             ),
