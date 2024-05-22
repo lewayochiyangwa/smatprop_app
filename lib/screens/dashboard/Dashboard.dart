@@ -5,8 +5,10 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:smatprop/screens/dashboard/tables/recent_file.dart';
 import '../../constants/global_constants.dart';
 import '../../widgets/CustomButtton.dart';
+import '../TopProperties.dart';
 
 
 class Dashboard extends StatefulWidget {
@@ -153,7 +155,19 @@ class _DashboardState extends State<Dashboard> {
                               ],),
                             ),
                           ),
-                          SizedBox(height: defaultPadding),
+                          SizedBox(height:12),
+                          Text("Top 5 List Properties",style: TextStyle(fontSize:14,fontWeight: FontWeight.bold),),
+                          MySlider3(),
+                       //   Text("My Property Applications",style: TextStyle(fontSize:14,fontWeight: FontWeight.bold),),
+                          Container(
+                            decoration: BoxDecoration(
+                              color: Colors.grey.shade200,
+                              borderRadius: BorderRadius.circular(10),
+
+                            ),
+                            width: MediaQuery.of(context).size.width * 0.95,
+                            child: RecentFiles(),
+                          ),
 
 
                         ],

@@ -5,6 +5,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../constants/global_constants.dart';
 import '../widgets/DrawerClass.dart';
+import 'Settings.dart';
 import 'dashboard/Dashboard.dart';
 
 
@@ -25,6 +26,7 @@ class _BottomNavigationExampleState extends State {
     Dashboard(),
     Dashboard(),
     Dashboard(),
+    Settings(),
 
 
 
@@ -71,7 +73,7 @@ class _BottomNavigationExampleState extends State {
               ),
             )
           ],
-        title:Image.asset('assets/images/herentals.jpeg',width: 70,height: 70,),
+        title:Image.asset('assets/images/logo.png',width: 70,height: 70,),
       ),
      /** appBar: AppBar(
         centerTitle: true,
@@ -88,11 +90,11 @@ class _BottomNavigationExampleState extends State {
         unselectedItemColor: Colors.white,
         items: [
           BottomNavigationBarItem(icon: Icon(Icons.home), label: "Home"),
-          BottomNavigationBarItem(icon: Icon(Icons.work), label: "Events"),
+          BottomNavigationBarItem(icon: Icon(Icons.work), label: "Available"),
           BottomNavigationBarItem(
-              icon: Icon(Icons.add_circle,), label: "Library"),
+              icon: Icon(Icons.add_circle,), label: "Payments"),
           BottomNavigationBarItem(
-              icon: Icon(Icons.location_on_sharp), label: "Pay Fees"),
+              icon: Icon(Icons.settings), label: "Settings"),
           /*BottomNavigationBarItem(
               icon: Icon(Icons.settings), label: "Extras"),*/
         ],
