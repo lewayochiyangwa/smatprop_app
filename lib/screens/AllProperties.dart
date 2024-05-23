@@ -109,15 +109,18 @@ class _AllPropertiesState extends State<AllProperties> {
           SizedBox(height: 15,),
           Padding(
             padding: const EdgeInsets.all(8.0),
-            child: TextField(
-              controller: _searchController,
-              decoration: InputDecoration(
-                labelText: 'Search by amount',
-                border: OutlineInputBorder(borderRadius:BorderRadius.circular(30.0),),
+            child: Container(
+              height:MediaQuery.of(context).size.height * 0.080,
+              child: TextField(
+                controller: _searchController,
+                decoration: InputDecoration(
+                  labelText: 'Search by amount',
+                  border: OutlineInputBorder(borderRadius:BorderRadius.circular(30.0),),
+                ),
+                onChanged: (value) {
+                  _filterDataList(value);
+                },
               ),
-              onChanged: (value) {
-                _filterDataList(value);
-              },
             ),
           ),
           Expanded(
@@ -221,20 +224,20 @@ class _AllPropertiesState extends State<AllProperties> {
                                ),
                                onPressed:(){},
                                child: Text("Apply",
-                                   style: TextStyle(fontSize:10,fontWeight: FontWeight.bold,color:Colors.black)
+                                   style: TextStyle(fontSize: MediaQuery.of(context).size.height * 0.014,fontWeight: FontWeight.bold,color:Colors.black)
                                )
                            ),
                          ],
                           ),
                           title: Text(data[3],  style: TextStyle(
-                            fontFamily: "Roboto",
-                            fontSize: 18.0,
+                            fontFamily:"OpenSans",
+                            fontSize:MediaQuery.of(context).size.height * 0.025,
                             fontWeight: FontWeight.bold,
                             color: Colors.black45,
                           ),),
                           subtitle: Text('\$ '+data[4],  style: TextStyle(
                           fontFamily: "Roboto",
-                            fontSize: 14.0,
+                            fontSize:MediaQuery.of(context).size.height * 0.020,
                             fontWeight: FontWeight.bold,
                             color: Colors.black38,
                           )),

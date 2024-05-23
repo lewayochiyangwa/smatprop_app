@@ -1,5 +1,11 @@
 import 'package:flutter/material.dart';
 
+import '../BottomNav.dart';
+import 'content_model.dart';
+
+
+
+
 
 
 
@@ -43,8 +49,13 @@ class _OnbordingState extends State<Onbording> {
                   padding: const EdgeInsets.all(25),
                   child: Column(
                     children: [
-                      Image.asset(contents[i].image,height: 300,)
-                    /*  SvgPicture.asset(
+                      Container(
+                      //  color: Colors.black,
+                          child: Image.asset(
+                            contents[i].image,height:MediaQuery.of(context).size.height*0.2,
+                          )
+                      )
+                      /*  SvgPicture.asset(
                         contents[i].image,
                         height: 300,
                       )*/,
@@ -57,7 +68,7 @@ class _OnbordingState extends State<Onbording> {
                           ),
                         ),
                       ),
-                      SizedBox(height: 10),
+                    //  SizedBox(height: 10),
                       Expanded(
                         child: Text(
                           contents[i].discription,
@@ -75,19 +86,64 @@ class _OnbordingState extends State<Onbording> {
             ),
           ),
           Container(
+
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: List.generate(
                 contents.length,
-                (index) => buildDot(index, context),
+                    (index) => buildDot(index, context),
               ),
             ),
           ),
+          Container(
 
+            height: 40,
+            margin: EdgeInsets.all(40),
+            width: double.infinity,
+            child: ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                fixedSize: const Size(100,20),
+                elevation: 10,
+                backgroundColor: Colors.blue,
+                textStyle: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 10,
+                    fontStyle: FontStyle.normal),
+              ),
+              child: Text(
+                  currentIndex == contents.length - 1 ? "Continue" : "Next"
+              ),
+              onPressed: () {
+                if (currentIndex == contents.length - 1) {
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(builder: (context) =>  const BottomNavigationExample()),
+
+                  );
+                }
+
+                _controller.nextPage(
+                  duration: Duration(milliseconds: 100),
+                  curve: Curves.bounceIn,
+                );
+              },
+
+            ),
+          )
         ],
       ),
     );
   }
 
-
+  Container buildDot(int index, BuildContext context) {
+    return Container(
+      height: 10,
+      width: currentIndex == index ? 25 : 10,
+      margin: EdgeInsets.only(right: 5),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(20),
+        color: Theme.of(context).primaryColor,
+      ),
+    );
+  }
 }
