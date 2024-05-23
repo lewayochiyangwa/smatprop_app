@@ -1,26 +1,10 @@
 import 'dart:convert';
-
-
-import 'package:GsamApp/src/model/tutorial/home_screen.dart';
-import 'package:GsamApp/src/view/screen/portfolio.dart';
-import 'package:GsamApp/src/view/screen/tutor_table.dart';
-import 'package:GsamApp/src/view/widget/page_wrapper.dart';
-import 'package:animated_text_kit/animated_text_kit.dart';
 import 'package:flutter/material.dart';
-import 'package:animations/animations.dart';
-import 'package:bottom_navy_bar/bottom_navy_bar.dart';
-import 'package:GsamApp/core/app_data.dart';
-import 'package:GsamApp/src/view/screen/profile_screen.dart';
 import 'package:http/http.dart' as http;
 import 'package:paynow/paynow.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import '../../../global_constants.dart';
 
-import 'prices.dart';
-import 'dashboard/dashboard_screen.dart';
-import 'dashboard/lee_anime_text.dart';
-import 'drawer.dart';
 
 class Payments extends StatefulWidget {
   const Payments({Key? key}) : super(key: key);
