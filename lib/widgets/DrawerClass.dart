@@ -1,10 +1,15 @@
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:smatprop/screens/Login/login_screen.dart';
 import '../constants/global_constants.dart';
 
 import '../screens/AllProperties.dart';
+import '../screens/Signup/signup_screen.dart';
 import 'CustomDevider.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 
 
@@ -18,11 +23,33 @@ class DrawerClass extends StatefulWidget {
 }
 
 class _DrawerClassState extends State<DrawerClass> {
+  late SharedPreferences logindata;
+  late String email="";
+  late String token="";
+  late String proLink="";
+  late String profilepicLink="";
 
   @override
   void initState() {
     super.initState();
+    initial_state();
+  }
 
+  initial_state() async {
+
+
+
+
+    logindata = await SharedPreferences.getInstance();
+    setState(() {
+    //  token=logindata.getString('token')!;
+    //  email=logindata.getString('email')!;
+      token = logindata.getString('token') ?? '';
+      email = logindata.getString('email') ?? '';
+      proLink = logindata.getString('proLink') ?? '';
+    });
+    print('kutoramba ka uku');
+    print(proLink);
 
   }
 
@@ -40,9 +67,9 @@ class _DrawerClassState extends State<DrawerClass> {
                 color:ThemeColor,
               ),
               accountName: Text("test name", style: TextStyle(color: ThemeColor2)),
-              accountEmail: Text("test email", style: TextStyle(color: ThemeColor2)),
+              accountEmail: Text(email, style: TextStyle(color: ThemeColor2)),
               currentAccountPicture: CircleAvatar(
-                backgroundImage: AssetImage("assets/images/1024.png"),
+                backgroundImage: NetworkImage(proLink),
               ),
               /*  decoration: BoxDecoration(
                 image: DecorationImage(
@@ -65,7 +92,7 @@ class _DrawerClassState extends State<DrawerClass> {
               color: ThemeColor,
               indent: 20.0,
               endIndent: 20.0,),
-            ListTile(
+          /*  ListTile(
               leading: Icon(Icons.contact_mail),
               title: Text("test 1",style: TextStyle(color: ThemeColor2)),
               onTap: () {
@@ -126,11 +153,21 @@ class _DrawerClassState extends State<DrawerClass> {
               color: ThemeColor,
               indent: 20.0,
               endIndent: 20.0,
-            ),
+            ),*/
             ListTile(
               leading: Icon(Icons.logout,color: Colors.red,),
-              title: Text("Logout",style: TextStyle(color: Colors.red),),
+              title: logindata.getString('function_log_control')=="granted"?Text("Logout",style: TextStyle(color: Colors.red),):
+              Text("Login",style: TextStyle(color: Colors.green),),
               onTap: () {
+                logindata.setString("function_log_control","");
+
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => LoginScreen(),
+                    ),
+                  );
+
 
 
               },

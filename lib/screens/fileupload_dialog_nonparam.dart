@@ -3,7 +3,9 @@ import 'dart:io';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:image_picker/image_picker.dart';
 import 'package:path/path.dart' as path;
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../constants/global_constants.dart';
 
@@ -20,6 +22,52 @@ class _FileUploadNonParamDialogState extends State<FileUploadNonParamDialog> {
   File? _selectedFile;
   bool _uploading = false;
 
+  late SharedPreferences logindata;
+  late String email="";
+  late String token="";
+
+
+
+  @override
+  void initState() {
+    super.initState();
+    initial_state();
+  }
+
+  initial_state() async {
+    logindata = await SharedPreferences.getInstance();
+    setState(() {
+      //  token=logindata.getString('token')!;
+      //  email=logindata.getString('email')!;
+      token = logindata.getString('token') ?? '';
+      email = logindata.getString('email') ?? '';
+    });
+    ////////////////////////////
+    var url = Uri.parse(ip_address3+'api/v1/auth/profilepic');
+    var headers = {'Content-Type': 'application/json'};
+    var body = json.encode({
+      'email':email
+
+    });
+    try {
+      var response = await http.post(url, headers: headers, body: body);
+      print("test response");
+      print(response.body);
+      setState(() {
+       // profilepicLink=ngrok+"/houses/"+response.body;
+        logindata.setString("proLink",ngrok+"/houses/"+response.body);
+        print("zvasetwa");
+        //print(profilepicLink);
+      });
+
+    } catch (error) {
+      print(error);
+    }
+   // print(profilepicLink);
+    ////////////////////////////
+
+  }
+
 
 
   void _showFilePicker() async {
@@ -33,9 +81,7 @@ class _FileUploadNonParamDialogState extends State<FileUploadNonParamDialog> {
   }
 
   void _uploadFile() async {
-    if (_selectedFile == null) {
-      return;
-    }
+    print("tapinda mu method uoload");
 
     setState(() {
       _uploading = true;
@@ -44,28 +90,35 @@ class _FileUploadNonParamDialogState extends State<FileUploadNonParamDialog> {
     try {
       var request = http.MultipartRequest(
         'POST',
-        Uri.parse(ip_address3+'api/v1/uploadflutter'),
+        Uri.parse(ip_address3+'api/v1/auth/uploadflutter'),
       );
+
+      print("after request declare");
+      print(token);
+      request.headers['Authorization'] = token;
+     // request.headers['Content-Type'] = 'application/json';
+      request.headers['Content-Type'] = 'multipart/form-data';
+      print("after request headers");
 
       request.files.add(await http.MultipartFile.fromPath(
         'file',
         _selectedFile!.path,
       ));
+      print("after request file attach");
+      print(_selectedFile!.path);
 
-     // request.fields['id'] = '13.567';
-     // request.fields['filename'] = '873';
       String? filePath = _selectedFile?.absolute.toString();
       String fileName = path.basename(filePath!);
       fileName = fileName.substring(0, fileName.length - 1);
 
-     // request.fields['ID'] = widget.id;
-      request.fields['ID'] = '55';
+      request.fields['ID'] = 'r174145e@students.msu.ac.zw';
       request.fields['FileName'] = fileName;
 
-      var response = await request.send();
+      print("after request ====");
 
+      var response = await request.send(); // Wait for the response
+      print(response);
       if (response.statusCode == 200) {
-
         print('File uploaded successfully');
         Navigator.of(context).pop();
       } else {
@@ -79,6 +132,28 @@ class _FileUploadNonParamDialogState extends State<FileUploadNonParamDialog> {
       });
     }
   }
+
+  void xx()async{
+
+
+    String filePath = _selectedFile!.path;
+    String fileExtension = filePath!.split('.').last;
+    final bytes = _selectedFile!.readAsBytesSync();
+print('this is the file extension');
+    final base64Image = base64Encode(bytes);
+        var url = Uri.parse('http://192.168.100.16:8081/api/v1/auth/uploadflutter2');
+        var headers = {'Content-Type': 'application/json'};
+        var body = json.encode({
+          'file_content':base64Image,
+          'user_id':'dd',
+          'ext':fileExtension
+        });
+    print('before post');
+          var response = await http.post(url, headers: headers, body: body);
+          print(response.body);
+  }
+
+
 
   @override
   Widget build(BuildContext context) {
@@ -136,7 +211,12 @@ class _FileUploadNonParamDialogState extends State<FileUploadNonParamDialog> {
                 fontSize: 10,
                 fontStyle: FontStyle.normal),
           ),
-          onPressed: _selectedFile != null && !_uploading ? _uploadFile : null,
+          onPressed:(){
+            print('upload is pressed');
+           // _selectedFile != null && !_uploading ? _uploadFile : null;
+            _uploadFile();
+           // xx();
+          } ,
          /* onPressed:(){
             print(_selectedFile?.absolute.toString());
             setState(() {

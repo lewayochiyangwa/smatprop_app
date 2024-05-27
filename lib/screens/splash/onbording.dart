@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:smatprop/screens/Login/login_screen.dart';
 
 import '../BottomNav.dart';
 import 'content_model.dart';
@@ -46,7 +47,7 @@ class _OnbordingState extends State<Onbording> {
               },
               itemBuilder: (_, i) {
                 return Padding(
-                  padding: const EdgeInsets.all(25),
+                  padding: const EdgeInsets.only(top:100,bottom:0),
                   child: Column(
                     children: [
                       Container(
@@ -117,7 +118,7 @@ class _OnbordingState extends State<Onbording> {
                 if (currentIndex == contents.length - 1) {
                   Navigator.pushReplacement(
                     context,
-                    MaterialPageRoute(builder: (context) =>  const BottomNavigationExample()),
+                    MaterialPageRoute(builder: (context) =>  const LoginScreen()),
 
                   );
                 }

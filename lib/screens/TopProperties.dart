@@ -1,6 +1,8 @@
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 
+import '../constants/global_constants.dart';
+
 class MySlider3 extends StatelessWidget {
   const MySlider3({
     Key? key
@@ -12,11 +14,11 @@ class MySlider3 extends StatelessWidget {
   Widget build(BuildContext context) {
 
     late List<String> imgList = [
-      'https://f99e-2c0f-f8f0-d348-0-d018-1143-f6ec-a987.ngrok-free.app/houses/1.jpg',
-      'https://f99e-2c0f-f8f0-d348-0-d018-1143-f6ec-a987.ngrok-free.app/houses/2.jpg',
-      'https://f99e-2c0f-f8f0-d348-0-d018-1143-f6ec-a987.ngrok-free.app/houses/3.jpg',
-      'https://f99e-2c0f-f8f0-d348-0-d018-1143-f6ec-a987.ngrok-free.app/houses/4.jpg',
-      'https://f99e-2c0f-f8f0-d348-0-d018-1143-f6ec-a987.ngrok-free.app/houses/5.jpg',
+      ngrok+'/houses/1.jpg',
+      ngrok+'/houses/2.jpg',
+      ngrok+'/houses/3.jpg',
+      ngrok+'/houses/4.jpg',
+      ngrok+'/houses/5.jpg',
 
     ];
 
@@ -57,7 +59,7 @@ class MySlider3 extends StatelessWidget {
                       ),
                     ),*/
                     Text(
-                      '1233 4th Street, 5th Avenue, New York, USA',
+                      'Avondale Harare, Zimbabwe',
                       style: TextStyle(
                         color: Colors.white,
                         fontSize:12.0,

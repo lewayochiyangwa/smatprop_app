@@ -10,6 +10,7 @@ import 'package:smatprop/widgets/CustomButtton.dart';
 
 import '../constants/global_constants.dart';
 import '../widgets/DrawerClass.dart';
+import 'PropertyApplication.dart';
 import 'fileupload_dialog.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
@@ -47,37 +48,56 @@ class _AllPropertiesState extends State<AllProperties> {
    String trx_empty="";
 
 
+  late String email="";
+  late String token="";
+
+
   @override
   void initState() {
     super.initState();
+    initial_state();
     _getData();
+  }
+  initial_state() async {
+    logindata = await SharedPreferences.getInstance();
+    setState(() {
+      //  token=logindata.getString('token')!;
+      //  email=logindata.getString('email')!;
+      token = logindata.getString('token') ?? '';
+      email = logindata.getString('email') ?? '';
+    });
   }
 
   Future<void> _getData() async {
 
     logindata = await SharedPreferences.getInstance();
-   // clientID=logindata.getString('clientID')!;
 
-    var url = Uri.parse('http://'+ip_address2+':93/gsam_clienttaku/api/report/trxn_requests');
-    var headers = {'Content-Type': 'application/json'};
-    var body = json.encode({'ClientID': 873});
+var my = ip_address3+'/api/v1/userz/property';
+print('vvvv'+my);
+    final response = await http.get(
+      Uri.parse(ip_address3+'api/v1/userz/property'),
+      // Send authorization headers to the backend.
+      headers: {
+        HttpHeaders.authorizationHeader: 'Bearer $token',
+      },
+    );
 
-    var response = await http.post(url, headers: headers, body: body);
+  //  var response = await http.post(url, headers: headers, body: body);
     if (response.statusCode == 200) {
       var jsonData = json.decode(response.body);
       print("takupinda mu table viewing===AllProperties.dart");
       print(jsonData['Data']);
       setState(() {
         print("tipei status yacho tione for empt trx");
-        print("iyo kk :: "+jsonData['Status']);
-        print("check condition");
-        print(jsonData['Status']=="Error");
+      //  print("iyo kk :: "+jsonData['Status']);
+      //  print("check condition");
+      //  print(jsonData['Status']=="Error");
 
-        trx_empty= jsonData['Status'];
-        if(jsonData['Status']=="Error"){
+        trx_empty= jsonData['status'];
+        if(jsonData['status']=="Error"){
 
         }else{
-          _dataList = jsonData['Data'];
+          _dataList = jsonData['data'];
           _filteredDataList = List.from(_dataList);
         }
 
@@ -205,7 +225,7 @@ class _AllPropertiesState extends State<AllProperties> {
 
                          children: [
 
-                           InkWell(
+                          /* InkWell(
                              child: Icon(Icons.upload_file,color: Colors.blue,),
                              onTap: () {
                                showDialog(
@@ -215,27 +235,57 @@ class _AllPropertiesState extends State<AllProperties> {
                                  },
                                );
                              },
-                           ),
-                           SizedBox(width: 10,),
+                           ),*/
+                          // SizedBox(width: 10,),
                            ElevatedButton(
+                          child: Text("Apply",
+                              style: TextStyle(fontSize: MediaQuery.of(context).size.height * 0.014,fontWeight: FontWeight.bold,color:Colors.white)
+                          ),
                                style: ElevatedButton.styleFrom(
                                    backgroundColor:ThemeColor,
                                    fixedSize: Size( MediaQuery.of(context).size.width * 0.20,MediaQuery.of(context).size.height / 120)// * 0.005 Set the button color here width, height
                                ),
-                               onPressed:(){},
-                               child: Text("Apply",
-                                   style: TextStyle(fontSize: MediaQuery.of(context).size.height * 0.014,fontWeight: FontWeight.bold,color:Colors.black)
-                               )
+                               onPressed:()async{
+                                 print('this is the data');
+                                 print(data['id']);
+                                 logindata = await SharedPreferences.getInstance();
+                                 print("this is the bool for login");
+                                 // print(logindata.getBool('login'));
+                                 // if(logindata.getBool('login')!){
+                                 if(logindata.getString('function_log_control')=="granted"){
+                                   Navigator.push(
+                                     context,
+                                     MaterialPageRoute(builder: (context) => PropertyApplication(id:data['id'] ,)),// Settings()),
+                                   );
+
+                                   //  print("hmm andisi kuziva");
+                                 }else{
+                                   ScaffoldMessenger.of(context).showSnackBar(
+                                     SnackBar(
+                                       content: Text("Login First To Apply"),
+                                       duration: Duration(seconds: 4),
+                                       behavior: SnackBarBehavior.floating,
+                                       backgroundColor:ThemeColor,
+                                       shape: RoundedRectangleBorder(
+                                         side: BorderSide(color: Colors.red, width: 2),
+                                         borderRadius: BorderRadius.circular(10),
+                                       ),
+                                     ),
+                                   );
+
+                                 }
+                               },
+
                            ),
                          ],
                           ),
-                          title: Text(data[3],  style: TextStyle(
+                          title: Text(data['description1'],  style: TextStyle(
                             fontFamily:"OpenSans",
                             fontSize:MediaQuery.of(context).size.height * 0.025,
                             fontWeight: FontWeight.bold,
                             color: Colors.black45,
                           ),),
-                          subtitle: Text('\$ '+data[4],  style: TextStyle(
+                          subtitle: Text(data['amount'].toString(),  style: TextStyle(
                           fontFamily: "Roboto",
                             fontSize:MediaQuery.of(context).size.height * 0.020,
                             fontWeight: FontWeight.bold,

@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import 'package:smatprop/screens/BottomNav.dart';
 import 'package:smatprop/screens/splash/onbording.dart';
 
+
 void main() {
 
 

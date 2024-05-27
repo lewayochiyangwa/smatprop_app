@@ -8,6 +8,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:smatprop/screens/dashboard/tables/recent_file.dart';
 import '../../constants/global_constants.dart';
 import '../../widgets/CustomButtton.dart';
+import '../LogIssues.dart';
 import '../TopProperties.dart';
 
 
@@ -41,7 +42,7 @@ class _DashboardState extends State<Dashboard> {
   initial_state() async {
     logindata = await SharedPreferences.getInstance();
     setState(() {
-      userId=logindata.getInt('id')!;
+     // userId=logindata.getInt('id')!;
       //clientID=logindata.getString('clientID')!;
     });
   }
@@ -88,7 +89,7 @@ class _DashboardState extends State<Dashboard> {
                           Container(
                           //  color: Colors.grey.shade200,
                             child: Padding(
-                              padding: const EdgeInsets.only(left: 30.0,right: 30.0),
+                              padding: const EdgeInsets.only(left: 30.0,right: 30.0,top: 20),
                               child: Row(
                                 children: [
                                   CustomButton(
@@ -96,13 +97,25 @@ class _DashboardState extends State<Dashboard> {
 
                                       logindata = await SharedPreferences.getInstance();
                                       print("this is the bool for login");
-                                      print(logindata.getBool('login'));
-                                      if(logindata.getBool('login')!){
+                                     // print(logindata.getBool('login'));
+                                     // if(logindata.getBool('login')!){
+                             if(logindata.getString('function_log_control')=="granted"){
 
 
                                         //  print("hmm andisi kuziva");
                                       }else{
-
+                               ScaffoldMessenger.of(context).showSnackBar(
+                                 SnackBar(
+                                   content: Text("Login First To Process Payment"),
+                                   duration: Duration(seconds: 4),
+                                   behavior: SnackBarBehavior.floating,
+                                   backgroundColor:ThemeColor,
+                                   shape: RoundedRectangleBorder(
+                                     side: BorderSide(color: Colors.red, width: 2),
+                                     borderRadius: BorderRadius.circular(10),
+                                   ),
+                                 ),
+                               );
 
                                       }
 
@@ -120,28 +133,29 @@ class _DashboardState extends State<Dashboard> {
                                       logindata = await SharedPreferences.getInstance();
                                       print("this is the bool for login");
                                       print(logindata.getBool('login'));
-                                      if(logindata.getBool('login')!){
 
-                                        showDialog(
-                                            context: context,
-                                            builder: (BuildContext context) {
-                                              return AlertDialog(
-                                                title: Text('Message'),
-                                                content: Text("Login To Submit Prayer Request"),
-                                                actions: <Widget>[
-                                                  TextButton(
-                                                    child: Text('OK'),
-                                                    onPressed: () {
-                                                      Navigator.of(context).pop();
-                                                    },
-                                                  ),
-                                                ],
-                                              );
-                                            }
+                                      if(logindata.getString('function_log_control')=="granted"){
+
+
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(builder: (context) => LogIssues()),// Settings()),
                                         );
+
                                         //  print("hmm andisi kuziva");
                                       }else{
-
+                                        ScaffoldMessenger.of(context).showSnackBar(
+                                          SnackBar(
+                                            content: Text("Login First To Send Issue"),
+                                            duration: Duration(seconds: 4),
+                                            behavior: SnackBarBehavior.floating,
+                                            backgroundColor: ThemeColor,
+                                            shape: RoundedRectangleBorder(
+                                              side: BorderSide(color: Colors.red, width: 2),
+                                              borderRadius: BorderRadius.circular(10),
+                                            ),
+                                          ),
+                                        );
 
                                       }
 

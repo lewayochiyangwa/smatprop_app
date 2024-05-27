@@ -2,6 +2,7 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:smatprop/constants/global_constants.dart';
 import 'package:smatprop/screens/pricing.dart';
 import 'dart:io';
@@ -23,6 +24,26 @@ class _SettingsState extends State<Settings> {
 
   File? _selectedFile;
   bool _uploading = false;
+  late SharedPreferences logindata;
+  late String email="";
+  late String token="";
+  late String proLink="";
+
+
+  @override
+  void initState() {
+    super.initState();
+    initial_state();
+  }
+
+  initial_state() async {
+    logindata = await SharedPreferences.getInstance();
+    setState(() {
+      token = logindata.getString('token') ?? '';
+      email = logindata.getString('email') ?? '';
+      proLink = logindata.getString('proLink') ?? '';
+    });
+  }
 
 
 
@@ -36,55 +57,7 @@ class _SettingsState extends State<Settings> {
     }
   }
 
-  void _uploadFile() async {
-    if (_selectedFile == null) {
-      return;
-    }
 
-    setState(() {
-      _uploading = true;
-    });
-
-    try {
-      var request = http.MultipartRequest(
-        'POST',
-        Uri.parse('http://192.168.100.27:8091/server/uploadflutter'),
-      );
-
-      request.files.add(await http.MultipartFile.fromPath(
-        'file',
-        _selectedFile!.path,
-      ));
-
-      // request.fields['id'] = '13.567';
-      // request.fields['filename'] = '873';
-      String? filePath = _selectedFile?.absolute.toString();
-      String fileName = path.basename(filePath!);
-
-
-      fileName = fileName.substring(0, fileName.length - 1);
-
-    //  request.fields['ID'] = widget.id;
-      request.fields['ID'] = '2';
-      request.fields['FileName'] = fileName;
-
-      var response = await request.send();
-
-      if (response.statusCode == 200) {
-
-        print('File uploaded successfully');
-        Navigator.of(context).pop();
-      } else {
-        print('File upload failed with status: ${response.statusCode}');
-      }
-    } catch (e) {
-      print('Error uploading file: $e');
-    } finally {
-      setState(() {
-        _uploading = false;
-      });
-    }
-  }
 
 //==============================
   @override
@@ -240,7 +213,8 @@ class _SettingsState extends State<Settings> {
         ),*/
         CircleAvatar(
           radius: 80.0,
-          backgroundImage: AssetImage("assets/images/logo.png"),
+         // backgroundImage: AssetImage("assets/images/logo.png"),
+          backgroundImage:NetworkImage(proLink.toString()),
         ),
 
         Positioned(
@@ -259,7 +233,7 @@ class _SettingsState extends State<Settings> {
             },
             child: Icon(
               Icons.camera_alt,
-              color: Colors.teal,
+              color: ThemeColor,
               size: 28.0,
             ),
           ),

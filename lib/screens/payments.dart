@@ -1,166 +1,116 @@
 import 'dart:convert';
+import 'dart:io';
+
+
+
 import 'package:flutter/material.dart';
+
 import 'package:http/http.dart' as http;
 import 'package:paynow/paynow.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
+import '../constants/global_constants.dart';
+import 'PropertyApplication.dart';
+
+
+
+
+
+
+
 
 
 
 class Payments extends StatefulWidget {
   const Payments({Key? key}) : super(key: key);
 
-
-
   @override
   State<Payments> createState() => _PaymentsState();
-
-
-
 }
 
 class _PaymentsState extends State<Payments> {
-  int newIndex = 0;
-  //SharedPreferences logindata = await SharedPreferences.getInstance();
-@override
-  void initState() {
-    // TODO: implement initState
-    super.initState();
-
-   /* setState(() {
-      username = logindata.getString('username')!;
-      username1 = logindata.getString('username1')!
-    }*/
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return PageWrapper(
-      child: Scaffold(
-        appBar: AppBar(
-          centerTitle: true,
-          backgroundColor: Colors.blue,
-        ),
-        drawer: DrawerClass(),
-        bottomNavigationBar: BottomNavyBar(
-          itemCornerRadius: 10,
-          selectedIndex: newIndex,
-          items: AppData.bottomNavyBarItems
-              .map(
-                (item) => BottomNavyBarItem(
-                  icon: item.icon,
-                  title: Text(item.title),
-                 //activeColor: item.activeColor,
-                  activeColor:Colors.black,
-                  inactiveColor: item.inActiveColor,
-                 // inactiveColor: item.inActiveColor,
-                ),
-              )
-              .toList(),
-          onItemSelected: (currentIndex) {
-            newIndex = currentIndex;
-            setState(() {});
-          },
-        ),
-        body:PageTransitionSwitcher(
-          duration: const Duration(seconds: 1),
-          transitionBuilder: (
-            Widget child,
-            Animation<double> animation,
-            Animation<double> secondaryAnimation,
-          ) {
-            return FadeThroughTransition(
-              animation: animation,
-              secondaryAnimation: secondaryAnimation,
-              child: child,
-
-            );
-
-          },
-          child: Payments.screens[newIndex],
-        ),
-      ),
-    );
-  }
-}
-
-class DialogExample extends StatelessWidget {
-  //final TextEditingController _textFieldController = TextEditingController();
-  const DialogExample({super.key});
-  //  DialogExample(_textFieldController);
-
-  @override
-  Widget build(BuildContext context) {
-    return AlertDialog(
-      title: const Text('Transaction'),
-      content: const Text('AlertDialog description'),
-     /* content: TextField(
-
-        controller: _textFieldController,
-
-        decoration: InputDecoration(hintText: "Enter Text"),
-
-      ), */
-
-      actions: <Widget>[
-        TextButton(
-          onPressed: () => Navigator.pop(context, 'Cancel'),
-          child: const Text('Cancel'),
-        ),
-        TextButton(
-          onPressed: () => Navigator.pop(context, 'OK'),
-          child: const Text('OK'),
-        ),
-      ],
-    );
-  }
-}
-
-
-class PaymentHome extends StatefulWidget {
-  const PaymentHome({Key? key}) : super(key: key);
-
-  @override
-  State<PaymentHome> createState() => _PaymentHomeState();
-}
-
-class _PaymentHomeState extends State<PaymentHome> {
   TextEditingController _trxnTypeController = TextEditingController();
   TextEditingController _textFieldController = TextEditingController();
   TextEditingController _textAmountController = TextEditingController();
   String getPollUrl="";
 
   // Initial Selected Value
-  String dropdownvalue = 'Deposit';
+  String dropdownvalue = 'Ecocash';
 
   // List of items in our dropdown menu
   var items = [
-    'Deposit',
-    'Withdraw',
+    'Ecocash',
+    'Inn Bucks',
+    'One Wallet',
   ];
 
   late SharedPreferences logindata;
   late String username;
   late String clientID;
 
+  List _filteredDataList = [];
+  List _dataList = [];
+
+
+
+  late String email="";
+  late String token="";
+
   @override
   void initState() {
     super.initState();
     initial_state();
+    _getData();
   }
   initial_state() async {
     logindata = await SharedPreferences.getInstance();
     setState(() {
-      username=logindata.getString('username')!;
-      clientID=logindata.getString('clientID')!;
+      token = logindata.getString('token') ?? '';
+      email = logindata.getString('email') ?? '';
     });
+  }
+
+
+  Future<void> _getData() async {
+
+    logindata = await SharedPreferences.getInstance();
+    var my = ip_address3+'/api/v1/admin/property';
+    print('vvvv'+my);
+    final response = await http.get(
+      Uri.parse(ip_address3+'api/v1/admin/property'),
+      // Send authorization headers to the backend.
+      headers: {
+        HttpHeaders.authorizationHeader: 'Bearer $token',
+      },
+    );
+    print("this is the response");
+print(response.statusCode);
+    //  var response = await http.post(url, headers: headers, body: body);
+    if (response.statusCode == 200) {
+      var jsonData = json.decode(response.body);
+      print("takupinda mu table viewing===AllProperties.dart");
+      print(jsonData['Data']);
+      setState(() {
+        print("tipei status yacho tione for empt trx");
+
+      //  trx_empty= jsonData['status'];
+        if(jsonData['status']=="Error"){
+
+        }else{
+          _dataList = jsonData['data'];
+       //   _filteredDataList = List.from(_dataList);
+        }
+
+      });
+    } else {
+      print('Request failed with status: ${response.statusCode}.');
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(
-          title: Text('Flutter TextField Example'),
-        ),
+
         body: SingleChildScrollView(
           child: Padding(
               padding: EdgeInsets.all(15),
@@ -188,7 +138,18 @@ class _PaymentHomeState extends State<PaymentHome> {
                       items: items.map((String items) {
                         return DropdownMenuItem(
                           value: items,
-                          child: Text(items),
+                          child: Row(
+                            children: [
+                              Text(items),
+                              const SizedBox(width: 20),
+                              if (items == 'Inn Bucks')
+                                Image.asset("assets/images/innbucks3.png", width: 50, height: 50)
+                              else if (items == 'Ecocash')
+                                Image.asset("assets/images/ecocash1.png", width: 50, height: 50)
+                              else if (items == 'One Wallet')
+                                  Image.asset("assets/images/onewallet.png", width: 50, height: 50)
+                            ],
+                          ),
                         );
                       }).toList(),
                       // After selecting the desired option,it will
@@ -316,9 +277,119 @@ class _PaymentHomeState extends State<PaymentHome> {
                       print("value from amount"+_textAmountController.text.toString());
                       print("value from drop down"+_trxnTypeController.text.toString());
 
-                      pay(dropdownvalue.toString(),_textAmountController.text.toString(),_textFieldController.text.toString());
+                     // pay(dropdownvalue.toString(),_textAmountController.text.toString(),_textFieldController.text.toString());
                     },
-                  )
+                  ),
+                  Container(
+                    height: 500,
+                    color: Colors.black,
+                    child: Padding(
+                      padding: EdgeInsets.all(15),
+                      child:ListView.builder(
+                        scrollDirection: Axis.vertical,
+                        shrinkWrap: true,
+                        itemCount: _filteredDataList.length,
+                        itemBuilder: (context, index) {
+                          print("this is the data"+_filteredDataList[index]);
+                          final data = _filteredDataList[index];
+                          return Container(
+                            decoration: BoxDecoration(
+                              border: Border.all(
+                                color: Colors.blue.shade100,
+                                width: 2,
+                              ),
+                              borderRadius: BorderRadius.circular(10),
+                              color: Colors.white,
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.grey.withOpacity(0.5),
+                                  spreadRadius: 2,
+                                  blurRadius: 5,
+                                  offset: Offset(0, 3), // changes position of shadow
+                                ),
+                              ],
+                            ),
+                            margin: EdgeInsets.all(10),
+                            child: Container(
+                              width: double.infinity,
+                              child: ListTile(
+                                leading:/*NetworkImage(data[1])!=null? CircleAvatar(
+                                backgroundImage: NetworkImage(data[1]),
+                              ):*/ClipRRect(
+                                  borderRadius: BorderRadius.circular(10.0),
+                                  child: Image.asset(
+                                    'assets/images/1.png',
+                                    width: 80,
+                                    height: 220,
+                                  ),
+                                ),
+                                trailing: Row(
+                                  mainAxisSize: MainAxisSize.min,
+
+                                  children: [
+
+                                    // SizedBox(width: 10,),
+                                    ElevatedButton(
+                                      child: Text("Apply",
+                                          style: TextStyle(fontSize: MediaQuery.of(context).size.height * 0.014,fontWeight: FontWeight.bold,color:Colors.white)
+                                      ),
+                                      style: ElevatedButton.styleFrom(
+                                          backgroundColor:ThemeColor,
+                                          fixedSize: Size( MediaQuery.of(context).size.width * 0.20,MediaQuery.of(context).size.height / 120)// * 0.005 Set the button color here width, height
+                                      ),
+                                      onPressed:()async{
+                                        print('this is the data');
+                                        print(data['id']);
+                                        logindata = await SharedPreferences.getInstance();
+                                        print("this is the bool for login");
+                                        // print(logindata.getBool('login'));
+                                        // if(logindata.getBool('login')!){
+                                        if(logindata.getString('function_log_control')=="granted"){
+                                          Navigator.push(
+                                            context,
+                                            MaterialPageRoute(builder: (context) => PropertyApplication(id:data['id'] ,)),// Settings()),
+                                          );
+
+                                          //  print("hmm andisi kuziva");
+                                        }else{
+                                          ScaffoldMessenger.of(context).showSnackBar(
+                                            SnackBar(
+                                              content: Text("Login First To Apply"),
+                                              duration: Duration(seconds: 4),
+                                              behavior: SnackBarBehavior.floating,
+                                              backgroundColor:ThemeColor,
+                                              shape: RoundedRectangleBorder(
+                                                side: BorderSide(color: Colors.red, width: 2),
+                                                borderRadius: BorderRadius.circular(10),
+                                              ),
+                                            ),
+                                          );
+
+                                        }
+                                      },
+
+                                    ),
+                                  ],
+                                ),
+                                title: Text(data['description1'],  style: TextStyle(
+                                  fontFamily:"OpenSans",
+                                  fontSize:MediaQuery.of(context).size.height * 0.025,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.black45,
+                                ),),
+                                subtitle: Text(data['amount'].toString(),  style: TextStyle(
+                                  fontFamily: "Roboto",
+                                  fontSize:MediaQuery.of(context).size.height * 0.020,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.black38,
+                                )),
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                  ),
                 ],
               )
           ),
@@ -327,7 +398,92 @@ class _PaymentHomeState extends State<PaymentHome> {
   }
 
 
+  void pay(String trxnType,String amount,String phone)async{
+    print("tapinda mu payment");
+    print("trn Type"+trxnType.toString());
+    print("amount"+trxnType.toString());
+    print("phone number"+trxnType.toString());
+    String  _phoneController = phone;
 
+    if(trxnType=="Deposit"){
+      Paynow paynow = Paynow(integrationKey: "960ad10a-fc0c-403b-af14-e9520a50fbf4", integrationId: "6054", returnUrl: "http://google.com", resultUrl: "http://google.co");
+      Payment payment = paynow.createPayment("user", "leroy.chiyangwa1994@gmail.com");
+
+      payment.add(trxnType,double.parse(amount));
+
+
+      // Initiate Mobile Payment
+      //paynow.sendMobile(payment, _phoneController ?? "0784442662",)
+      paynow.sendMobile(payment, _phoneController ?? phone,)
+          .then((InitResponse response)async{
+        // display results
+        print(response());
+        print("ndaakuda");
+        print('------------------');
+        print(response.pollUrl);
+        getPollUrl = response.pollUrl;
+
+        var url = Uri.parse('http://'+ip_address2+':8091/server/paynowMobile');
+
+        Map data = {
+          'type' : trxnType,
+          'amount' : amount,
+          'clientID' : clientID,
+          'valueDate' :username,
+          'device' : 'mobile',
+          'callback':getPollUrl
+        };
+        //encode Map to JSON
+        var body = json.encode(data);
+
+        print("this is the body"+body);
+
+        var response1 = await http.post(url,
+            headers: {"Content-Type": "application/json"},
+            body: body
+        );
+        print("${response1.statusCode}");
+        print("${response1.body}");
+        //   return response;
+        //  }
+
+        print('------------------');
+        await Future.delayed(Duration(seconds: 20~/2));
+        // Check Transaction status from pollUrl
+        paynow.checkTransactionStatus(response.pollUrl)
+            .then((StatusResponse status) async {
+          print("Before status paid");
+          print("hatsvike");
+          print("before Uri");
+          //  print(postResponse.body);
+          print(status.paid);
+        });
+      });
+    }
+    else if(trxnType=="Withdraw"){
+      var url = Uri.parse('http://'+ip_address+':8091/server/paynowMobile');
+
+      Map data = {
+        'type' : trxnType,
+        'amount' : amount,
+        'clientID' : clientID,
+        'valueDate' :username,
+        'device' : 'mobile',
+        'callback':''
+      };
+      //encode Map to JSON
+      var body = json.encode(data);
+
+      print("this is the body"+body);
+
+      var response1 = await http.post(url,
+          headers: {"Content-Type": "application/json"},
+          body: body
+      );
+    }
+
+
+  }
 }
 
 

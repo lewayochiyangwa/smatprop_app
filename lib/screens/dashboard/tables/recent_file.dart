@@ -4,70 +4,124 @@ import 'package:flutter/material.dart';
 
 import 'package:get/get.dart';
 import 'package:get/get_core/src/get_main.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../constants/global_constants.dart';
 import '../../../services/top_five_prices.dart';
 
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 
 
-
-class RecentFiles extends StatelessWidget {
+class RecentFiles extends StatefulWidget {
   const RecentFiles({
     Key? key,
   }) : super(key: key);
 
   @override
+  State<RecentFiles> createState() => _RecentFilesState();
+}
+
+class _RecentFilesState extends State<RecentFiles> {
+
+
+  final results=[
+    {
+      "icon": "assets/images/cbz.png",
+      "title": "Borrowdale",
+      "grade": "Denied",
+      "size":"20USD",
+      "date": "Pending"
+    },
+    {
+      "icon": "assets/images/cbz.png",
+      "title": "Borrowdale",
+      "grade": "Paid",
+      "size":"20USD",
+      "date": "Done"
+    },
+    {
+      "icon": "assets/images/cbz.png",
+      "title": "Greendale",
+      "grade": "Paid",
+      "size":"40USD",
+      "date": "Denied"
+    }
+  ];
+
+  late SharedPreferences logindata;
+  late String email = "";
+  late String token = "";
+  late String proLink = "";
+  bool top_prices_isLoading = true;
+  List<TopFivePrices> topprices_data2 = <TopFivePrices>[];
+
+  @override
+  void initState() {
+    super.initState();
+    initial_state();
+  }
+
+  void initial_state() async {
+    logindata = await SharedPreferences.getInstance();
+    email = logindata.getString('email') ?? '';
+    token = logindata.getString('token') ?? '';
+    print('this is the token $token');
+    print('this is the email $email');
+    final url = Uri.parse(ip_address3 + 'api/v1/userz/myproperty_stats');
+
+    final headers = {
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer $token',
+    };
+    final body = json.encode({
+      "email": email,
+    });
+
+    print('Sending POST request for top five prices');
+    final response = await http.post(url, headers: headers, body: body);
+
+    print('Waiting for response');
+    if (response.statusCode == 200) {
+      print("Success");
+      final jsonData = json.decode(response.body) as List<dynamic>;
+      topprices_data2.assignAll(jsonData
+          .map((item) => TopFivePrices.fromJson(item as Map<String, dynamic>)));
+      setState(() {
+        top_prices_isLoading = false;
+      });
+    }
+  }
+
+
+  @override
+  @override
   Widget build(BuildContext context) {
-
-    final results=[
-      {
-        "icon": "assets/images/cbz.png",
-        "title": "Borrowdale",
-        "grade": "Denied",
-        "size":"20USD",
-        "date": "Pending"
-      },
-      {
-        "icon": "assets/images/cbz.png",
-        "title": "Borrowdale",
-        "grade": "Paid",
-        "size":"20USD",
-        "date": "Done"
-      },
-      {
-        "icon": "assets/images/cbz.png",
-        "title": "Greendale",
-        "grade": "Paid",
-        "size":"40USD",
-        "date": "Denied"
-      }
-    ];
-
-
-  final dashcard_controller =  Get.put<TopPricesController>(TopPricesController());
-    return  Obx(() => dashcard_controller.top_prices_isLoading.value
-
-        ?  Center(child:AvatarGlow(
-      glowColor: Colors.blue,
-      endRadius: 90.0,
-      duration: Duration(milliseconds: 2000),
-      repeat: true,
-      showTwoGlows: true,
-      repeatPauseDuration: Duration(milliseconds: 100),
-      child: Material(
-        elevation: 8.0,
-        shape: CircleBorder(),
-        child: CircleAvatar(
-          backgroundColor: Colors.grey[100],
-          child: Image.asset(
-            'assets/images/logo.png',
-            height: 60,
+    return top_prices_isLoading
+        ? Center(
+      child: AvatarGlow(
+        glowColor: Colors.blue,
+        endRadius: 90.0,
+        duration: Duration(milliseconds: 2000),
+        repeat: true,
+        showTwoGlows: true,
+        repeatPauseDuration: Duration(milliseconds: 100),
+        child: Material(
+          elevation: 8.0,
+          shape: CircleBorder(),
+          child: CircleAvatar(
+            backgroundColor: Colors.grey[100],
+            child: Image.asset(
+              'assets/images/logo.png',
+              height: 60,
+            ),
+            radius: 40.0,
           ),
-          radius: 40.0,
         ),
       ),
-    )):Container(
+    )
+        : Container(
       padding: EdgeInsets.all(defaultPadding),
       decoration: BoxDecoration(
         color: secondaryColor,
@@ -84,26 +138,21 @@ class RecentFiles extends StatelessWidget {
                   style: Theme.of(context).textTheme.subtitle1,
                 ),
               ),
-              SizedBox(width: 100,),
+              SizedBox(width: 100),
               Expanded(
                 child: InkWell(
-                  onTap: () {
-                  /*  Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) =>  PricesNavy()),
-
-                    );*/
-                    // handle tap event
-                  },
+                  onTap: () {},
                   child: Row(
                     children: [
                       Text(
                         "See All",
-                       // style: Theme.of(context).textTheme.subtitle1,
-                        style: TextStyle(fontStyle: FontStyle.italic,color: Colors.green.shade700),
+                        style: TextStyle(
+                          fontStyle: FontStyle.italic,
+                          color: Colors.green.shade700,
+                        ),
                       ),
                       SizedBox(width: 8.0),
-                      Icon(Icons.send,color: Colors.blue),
+                      Icon(Icons.send, color: Colors.blue),
                     ],
                   ),
                 ),
@@ -117,80 +166,79 @@ class RecentFiles extends StatelessWidget {
               columnSpacing: defaultPadding,
               columns: [
                 DataColumn(
-                  label: Text("Location",style: TextStyle(
-                    fontSize:MediaQuery.of(context).size.height * 0.015,
-                  ),),
+                  label: Text(
+                    "Location",
+                    style: TextStyle(
+                      fontSize: MediaQuery.of(context).size.height * 0.015,
+                    ),
+                  ),
                 ),
                 DataColumn(
-                  label: Text("Application \n Status",style: TextStyle(
-                    fontSize: MediaQuery.of(context).size.height * 0.015,
-                  ),),
+                  label: Text(
+                    "Application \n Status",
+                    style: TextStyle(
+                      fontSize: MediaQuery.of(context).size.height * 0.015,
+                    ),
+                  ),
                 ),
                 DataColumn(
-                  label: Text("Fee \n Amount",style: TextStyle(
-                    fontSize:MediaQuery.of(context).size.height * 0.015,
-                  ),),
+                  label: Text(
+                    "Fee \n Amount",
+                    style: TextStyle(
+                      fontSize: MediaQuery.of(context).size.height * 0.015,
+                    ),
+                  ),
                 ),
                 DataColumn(
-                  label: Text("Fee Status",style: TextStyle(
-                    fontSize:MediaQuery.of(context).size.height * 0.015,
-                  ),),
+                  label: Text(
+                    "Fee Status",
+                    style: TextStyle(
+                      fontSize: MediaQuery.of(context).size.height * 0.015,
+                    ),
+                  ),
                 ),
-
               ],
               rows: List.generate(
-             //   demoRecentFiles.length,
-   // dashcard_controller.topprices_data2.length,
-               results.length,
-                   // (index) => recentFileDataRow(dashcard_controller.topprices_data2[index]),
-                    (index) => recentFileDataRow2(results[index]),
+                topprices_data2.length,
+                    (index) => recentFileDataRow(topprices_data2[index]),
               ),
             ),
           ),
         ],
       ),
-    ));
+    );
   }
 }
 
 //DataRow recentFileDataRow(RecentFile fileInfo) {
   DataRow recentFileDataRow(TopFivePrices fileInfo) {
+    print('regai tipedzerane');
+  print(fileInfo);
   return DataRow(
     cells: [
       DataCell(
         Row(
           children: [
-            Container(
-              padding: EdgeInsets.all(defaultPadding * 0.75),
-              height: 50,
-              width: 50,
-              decoration: BoxDecoration(
-               // color: info.color!.withOpacity(0.1),
-                borderRadius: const BorderRadius.all(Radius.circular(10)),
-              ),
-           //   child:Image.network("http://192.168.100.3:93/zam_live/assets/img/top/econet_mobile_525090174.png")
-    child:Image.asset(fileInfo.icon!)
-              //Text(fileInfo.icon!)
-            ),
-
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: defaultPadding),
-              child: Text(fileInfo.title!,style: TextStyle(
-                fontSize: 10
+              child: Text(fileInfo.address,style: TextStyle(
+                  fontSize: 10
               ),overflow: TextOverflow.ellipsis, maxLines: 2),
             ),
+
           ],
         ),
       ),
     //  DataCell(Text(fileInfo.size!)),
       DataCell(
           Text(
-              double.parse(fileInfo.size!.toString()).toStringAsFixed(2),
+            'Pending',
             style: TextStyle(fontSize: 10),
           )
 
       ),
-      DataCell(Text(fileInfo.date!,style: TextStyle(fontSize: 10),)),
+      DataCell(Text(fileInfo.amount,style: TextStyle(fontSize: 10),)),
+      DataCell(Text("Pending",style: TextStyle(fontSize: 10),)),
 
     ],
   );
