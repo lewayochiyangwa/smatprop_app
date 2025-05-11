@@ -14,11 +14,11 @@ class MySlider3 extends StatelessWidget {
   Widget build(BuildContext context) {
 
     late List<String> imgList = [
-      ngrok+'/houses/1.jpg',
-      ngrok+'/houses/2.jpg',
-      ngrok+'/houses/3.jpg',
-      ngrok+'/houses/4.jpg',
-      ngrok+'/houses/5.jpg',
+      ngrok2+'/houses/1.jpg',
+      ngrok2+'/houses/2.jpg',
+      ngrok2+'/houses/3.jpg',
+      ngrok2+'/houses/4.jpg',
+      ngrok2+'/houses/5.jpg',
 
     ];
 

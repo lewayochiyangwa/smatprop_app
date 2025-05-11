@@ -184,7 +184,194 @@ print('vvvv'+my);
                     itemCount: _filteredDataList.length,
                     itemBuilder: (context, index) {
                       final data = _filteredDataList[index];
-                      return Container(
+                      print(data['id']);
+                      print(data['id'].runtimeType);
+                      return Card(
+                        margin: EdgeInsets.all(12.0),
+                        child: Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: ExpansionTile(
+                            backgroundColor: Colors.white,
+                            title: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: <Widget>[
+                                Row(
+                                  children: <Widget>[
+                                    Text('Mabvuku'),
+                                    Spacer(),
+                                    Row(
+                                      children: [
+                                        Text("Expand"),
+                                        Icon(Icons.arrow_drop_down),
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                                Text(data['description1']),
+                                Row(
+                                  children: <Widget>[
+                                    Text("12 USD/Month"),
+                                    Spacer(),
+                                    ElevatedButton(
+                                      child: Text("Apply",
+                                          style: TextStyle(fontSize: MediaQuery.of(context).size.height * 0.014,fontWeight: FontWeight.bold,color:Colors.white)
+                                      ),
+                                      style: ElevatedButton.styleFrom(
+                                          backgroundColor:ThemeColor,
+                                          fixedSize: Size( MediaQuery.of(context).size.width * 0.20,MediaQuery.of(context).size.height / 120)// * 0.005 Set the button color here width, height
+                                      ),
+                                      onPressed:()async{
+                                        print('this is the data');
+
+                                        logindata = await SharedPreferences.getInstance();
+                                        print("this is the bool for login");
+                                        // print(logindata.getBool('login'));
+                                        // if(logindata.getBool('login')!){
+                                        if(logindata.getString('function_log_control')=="granted"){
+                                          Navigator.push(
+                                            context,
+                                            MaterialPageRoute(builder: (context) => PropertyApplication(id:data['id'],)),// Settings()),
+                                          );
+
+                                          //  print("hmm andisi kuziva");
+                                        }else{
+                                          ScaffoldMessenger.of(context).showSnackBar(
+                                            SnackBar(
+                                              content: Text("Login First To Apply"),
+                                              duration: Duration(seconds: 4),
+                                              behavior: SnackBarBehavior.floating,
+                                              backgroundColor:ThemeColor,
+                                              shape: RoundedRectangleBorder(
+                                                side: BorderSide(color: Colors.red, width: 2),
+                                                borderRadius: BorderRadius.circular(10),
+                                              ),
+                                            ),
+                                          );
+
+                                        }
+                                      },
+
+                                    ),
+
+                                  ],
+                                ),
+                              ],
+                            ),
+                            trailing: SizedBox(),
+                            children: <Widget>[
+                              Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Row(
+                                  children: <Widget>[
+                                Row(
+                                //  mainAxisAlignment:MainAxisAlignment.spaceAround,
+                                  children: [
+
+                                    ClipRRect(
+                                      borderRadius: BorderRadius.all(Radius.circular(10.0)
+                                      ),
+                                      child: Container(
+                                        
+                                        height: 120,
+                                        width: 120,
+                                      
+                                        child: Image.asset(
+                                          'assets/images/1.png',
+                                          height: 120,
+                                          width: 120,
+                                          fit: BoxFit.fill,
+                                        ),
+                                      ),
+                                    ),
+                                    SizedBox(width: 20,),
+
+                                    Column(
+                                      children: [
+                                        Row(
+                                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                          children: [
+                                            Row(
+                                              children: [
+                                                Icon(Icons.bed_sharp),
+                                                Text("3",style: TextStyle(fontSize: 12),),
+                                                Text("Bedrooms",style: TextStyle(fontSize: 12),),
+                                              ],
+                                            ),
+                                            SizedBox(width: 10,),
+                                            Row(
+                                              children: [
+                                                Icon(Icons.bathtub_outlined),
+                                                Text("3",style: TextStyle(fontSize: 12),),
+                                                Text("Bedrooms",style: TextStyle(fontSize: 12),),
+                                              ],
+                                            ),
+                                          ],
+                                        ),
+                                        SizedBox(height: 10,),
+                                        Row(
+                                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                          children: [
+                                            Row(
+                                              mainAxisAlignment: MainAxisAlignment.start,
+                                              children: [
+                                                Icon(Icons.landscape_outlined),
+                                                Text("1000",style: TextStyle(fontSize: 12),),
+                                                Text("m        ",style: TextStyle(fontSize: 12),),
+                                              ],
+                                            ),
+                                            SizedBox(width: 10,),
+                                            Row(
+                                              mainAxisAlignment: MainAxisAlignment.start,
+                                              children: [
+                                                Icon(Icons.bathtub_outlined),
+                                                Text("2",style: TextStyle(fontSize: 12),),
+                                                Text("Acres      ",style: TextStyle(fontSize: 12),),
+                                              ],
+                                            ),
+                                          ],
+                                        ),
+                                        Column(
+                                          children: [
+                                            Text("Description",style: TextStyle(fontSize: 12),),
+                                            Container(
+                                              height: 50,
+                                              width: 200,
+                                              child: Text("Presenting a captivating house for sale nestled in the serene region of Christon Bank",
+                                                style: TextStyle(fontSize: 12,
+
+                                                ),
+                                                softWrap: true,
+
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ],
+                                    ),
+
+
+
+                                  ],
+                                ),
+                                 //   Spacer(),
+                                 //   Icon(Icons.check),
+                                  ],
+                                ),
+                              ),
+                            /*  Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Row(
+                                  children: <Widget>[
+                                    Text("chiyaz"),
+                                    Spacer(),
+                                    Icon(Icons.check),
+                                  ],
+                                ),
+                              )*/
+                            ],
+                          ),
+                        ),
+                      );/*Container(
                      /*   decoration: BoxDecoration(
                           border: Border.all(
                               color: Colors.blue.shade100,
@@ -209,10 +396,8 @@ print('vvvv'+my);
                           ],
                         ),
                         margin: EdgeInsets.all(10),
-                        child: ListTile(
-                          leading:/*NetworkImage(data[1])!=null? CircleAvatar(
-                            backgroundImage: NetworkImage(data[1]),
-                          ):*/ClipRRect(
+                        child: ExpansionTile(
+                          leading:ClipRRect(
                             borderRadius: BorderRadius.circular(10.0),
                             child: Image.asset(
                               'assets/images/1.png',
@@ -224,19 +409,6 @@ print('vvvv'+my);
                             mainAxisSize: MainAxisSize.min,
 
                          children: [
-
-                          /* InkWell(
-                             child: Icon(Icons.upload_file,color: Colors.blue,),
-                             onTap: () {
-                               showDialog(
-                                 context: context,
-                                 builder: (BuildContext context) {
-                                   return FileUploadDialog(id:data[0].toString());
-                                 },
-                               );
-                             },
-                           ),*/
-                          // SizedBox(width: 10,),
                            ElevatedButton(
                           child: Text("Apply",
                               style: TextStyle(fontSize: MediaQuery.of(context).size.height * 0.014,fontWeight: FontWeight.bold,color:Colors.white)
@@ -292,7 +464,7 @@ print('vvvv'+my);
                             color: Colors.black38,
                           )),
                         ),
-                      );
+                      );*/
                     },
                   ),
                 ),
@@ -303,6 +475,77 @@ print('vvvv'+my);
         ],
 
       ),
+    );
+  }
+
+  Widget _buildTitle(Map<int, dynamic>? data) {
+    int myid=data as int;
+    print('muchaitasei nezvinhu zvacho');
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: <Widget>[
+        Row(
+          children: <Widget>[
+            Text("Mabvuku"),
+            Spacer(),
+            Row(
+              children: [
+                Text("Expand"),
+                Icon(Icons.arrow_drop_down),
+              ],
+            ),
+          ],
+        ),
+        Text("Rental"),
+        Row(
+          children: <Widget>[
+            Text("12 USD/Month"),
+            Spacer(),
+    ElevatedButton(
+    child: Text("Apply",
+    style: TextStyle(fontSize: MediaQuery.of(context).size.height * 0.014,fontWeight: FontWeight.bold,color:Colors.white)
+    ),
+    style: ElevatedButton.styleFrom(
+    backgroundColor:ThemeColor,
+    fixedSize: Size( MediaQuery.of(context).size.width * 0.20,MediaQuery.of(context).size.height / 120)// * 0.005 Set the button color here width, height
+    ),
+    onPressed:()async{
+    print('this is the data');
+    print(myid);
+    logindata = await SharedPreferences.getInstance();
+    print("this is the bool for login");
+    // print(logindata.getBool('login'));
+    // if(logindata.getBool('login')!){
+    if(logindata.getString('function_log_control')=="granted"){
+    Navigator.push(
+    context,
+    MaterialPageRoute(builder: (context) => PropertyApplication(id:myid ,)),// Settings()),
+    );
+
+    //  print("hmm andisi kuziva");
+    }else{
+    ScaffoldMessenger.of(context).showSnackBar(
+    SnackBar(
+    content: Text("Login First To Apply"),
+    duration: Duration(seconds: 4),
+    behavior: SnackBarBehavior.floating,
+    backgroundColor:ThemeColor,
+    shape: RoundedRectangleBorder(
+    side: BorderSide(color: Colors.red, width: 2),
+    borderRadius: BorderRadius.circular(10),
+    ),
+    ),
+    );
+
+    }
+    },
+
+    ),
+
+          ],
+        ),
+      ],
     );
   }
 

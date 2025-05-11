@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 
 import 'package:smatprop/screens/BottomNav.dart';
 import 'package:smatprop/screens/splash/onbording.dart';
+import 'package:smatprop/widgets/CollapsibleCard.dart';
 
 
 void main() {
@@ -18,7 +19,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return GetMaterialApp(
       debugShowCheckedModeBanner: false,
-      home:Onbording(),//BottomNavigationExample(),
+      home:Onbording(),//ExpandedTile(),//Onbording(),//BottomNavigationExample(),
 
     );
   }

@@ -93,7 +93,8 @@ class _LoginFormState extends State<LoginForm> {
                     print("set state");
                   });
 
-                  var url = Uri.parse('http://'+ip_address2+':8081/api/v1/auth/authenticate');
+                 // var url = Uri.parse('http://'+ip_address2+':8081/api/v1/auth/authenticate');
+                  var url = Uri.parse(ngrok+'/api/v1/auth/authenticate');
                   var headers = {'Content-Type': 'application/json'};
                   var body = json.encode({
                     'email': _email.text,
@@ -151,7 +152,8 @@ class _LoginFormState extends State<LoginForm> {
 
                       }else{
                         ////////////////////////////
-                        var url = Uri.parse(ip_address3+'api/v1/auth/profilepic');
+                     //   var url = Uri.parse(ip_address3+'api/v1/auth/profilepic');
+                        var url = Uri.parse(ngrok+'/api/v1/auth/profilepic');
                         var headers = {'Content-Type': 'application/json'};
                         var body = json.encode({
                        //   'email':loginResponse.data.email
